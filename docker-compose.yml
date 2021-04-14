@@ -1,0 +1,35 @@
+version: '3'
+services:
+  selenoid:
+    image: "aerokube/selenoid:latest"
+    container_name: selenoid
+    ports:
+      - "4444:4444"
+    network_mode: bridge
+    volumes:
+      - ".:/etc/selenoid"
+      - "./target:/output"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    command: ["-conf", "/etc/selenoid/browsers.json", "-timeout", "50s"]
+  selenoid-ui:
+    image: "aerokube/selenoid-ui:latest"
+    container_name: selenoid-ui
+    links:
+      - selenoid
+    ports:
+      - "8083:8080"
+    network_mode: bridge
+    command: ["--selenoid-uri", "http://selenoid:4444"]
+  chrome_89.0:
+    image: "selenoid/vnc:chrome_89.0"
+    container_name: chrome_89.0
+    links:
+      - selenoid
+      - selenoid-ui
+    depends_on:
+      - selenoid
+      - selenoid-ui
+    network_mode: bridge
+    volumes:
+      - "/dev/shm:/dev/shm"
+

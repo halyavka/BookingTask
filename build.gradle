@@ -14,14 +14,15 @@ compileTestJava.options.encoding = 'UTF-8'
 
 repositories {
     jcenter()
-    maven { url 'http://nexus.newage.io/repository/hrzn-maven/' }
     maven { url "https://oss.sonatype.org/content/groups/public" }
     maven { url "http://packages.confluent.io/maven/" }
 }
 
 dependencies {
     testCompile group: 'org.testng', name: 'testng', version: '7.4.0'
-
+    testCompile group: 'mailslurp.mailslurp-client', name: 'mailslurp-client-java', version: '11.4.25'
+    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.0.0-beta-1'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.8.0'
 }
 
 
@@ -58,3 +59,5 @@ task('dockerCreateDockerfile', dependsOn: testJar, type: Copy) {
 }
 
 assemble.dependsOn dockerCreateDockerfile
+test.onlyIf { !project.hasProperty('skip.tests') }
+

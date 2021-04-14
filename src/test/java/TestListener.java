@@ -1,48 +1,34 @@
 
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
+import java.io.File;
+import java.io.IOException;
 
 
 public class TestListener implements ITestListener {
 
-    private static String getTestMethodName(ITestResult iTestResult) {
-        return iTestResult.getMethod().getConstructorOrMethod().getName();
-    }
-
-    @Override
-    public void onStart(ITestContext iTestContext) {
-
-    }
-
-    @Override
-    public void onFinish(ITestContext iTestContext) {
-
-    }
-
-    @Override
-    public void onTestStart(ITestResult iTestResult) {
-
-    }
-
-    @Override
-    public void onTestSuccess(ITestResult iTestResult) {
-
-    }
+    String filePath = "src/test/resources";
 
     @Override
     public void onTestFailure(ITestResult iTestResult) {
-
+        String methodName = iTestResult.getName();
+        ITestContext context = iTestResult.getTestContext();
+        WebDriver driver = (WebDriver) context.getAttribute("driver");
+        takeScreenShot(methodName, driver);
     }
 
-    @Override
-    public void onTestSkipped(ITestResult iTestResult) {
-
-    }
-
-    @Override
-    public void onTestFailedButWithinSuccessPercentage(ITestResult iTestResult) {
-        System.out.println("Test failed but it is in defined success ratio " + getTestMethodName(iTestResult));
+    public void takeScreenShot(String methodName, WebDriver driver) {
+        File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        try {
+            FileUtils.copyFile(scrFile, new File(filePath + methodName + ".png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
