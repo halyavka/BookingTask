@@ -1,0 +1,60 @@
+buildscript {
+    repositories { jcenter() }
+}
+
+apply plugin: 'java'
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.fork = true
+    options.forkOptions.setMemoryMaximumSize("1g")
+}
+
+compileTestJava.options.encoding = 'UTF-8'
+
+repositories {
+    jcenter()
+    maven { url 'http://nexus.newage.io/repository/hrzn-maven/' }
+    maven { url "https://oss.sonatype.org/content/groups/public" }
+    maven { url "http://packages.confluent.io/maven/" }
+}
+
+dependencies {
+    testCompile group: 'org.testng', name: 'testng', version: '7.4.0'
+
+}
+
+
+test {
+    useTestNG()
+    systemProperties System.properties
+    systemProperty "user.timezone", "UTC"
+    testLogging.showStandardStreams = true
+    maxParallelForks = 12
+}
+
+task('testJar', type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+    archiveName = 'booking_task.jar'
+}
+
+task('dockerCreateDockerfile', dependsOn: testJar, type: Copy) {
+
+    into "build/docker"
+    from('src/test/resources') {
+        into "resources"
+    }
+    from(configurations.testRuntime) {
+        into "lib"
+    }
+
+    from(testJar) {
+        into "lib"
+    }
+
+    from("src/docker")
+    from("src/test/suite.xml")
+}
+
+assemble.dependsOn dockerCreateDockerfile

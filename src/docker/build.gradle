@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'groovy'
+}
+
+test {
+    useTestNG() {
+        useDefaultListeners = true
+        suites 'suite.xml'
+    }
+    testLogging {
+        exceptionFormat = 'full'
+    }
+    afterTest { desc, result ->
+        println "${desc.className} ${desc.name} ${result.resultType}"
+    }
+    //Force tests to always run, even if they haven't been updated
+    outputs.upToDateWhen { false }
+}
+
+tasks.withType(Test) {
+    testClassesDirs = zipTree('lib/booking_task.jar')
+    classpath = fileTree(dir: 'lib', include: '*.jar')
+    systemProperties System.properties
+    systemProperty "user.timezone","UTC"
+    testLogging.showStandardStreams = true
+}
+
