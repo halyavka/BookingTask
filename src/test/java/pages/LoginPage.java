@@ -29,8 +29,8 @@ public class LoginPage extends BasePage {
         driver.findElement(passwordField).clear();
         driver.findElement(passwordField).sendKeys(password);
         driver.findElement(singInButton).click();
-        Driver.sleep(3); // unknown behaviour
-        driver.findElement(singInButton).click();
+        //Driver.sleep(3); // unknown behaviour
+        //driver.findElement(singInButton).click();
     }
 
 }
